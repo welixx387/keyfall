@@ -1,0 +1,19 @@
+{
+  "name": "keyfall",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Магазин и раздача ключей Steam с оплатой через @CryptoBot",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "seed": "node scripts/seed.js"
+  },
+  "engines": {
+    "node": ">=21.7"
+  },
+  "dependencies": {
+    "express": "^5.3.0",
+    "qrcode": "^1.5.4"
+  }
+}

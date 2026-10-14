@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>KEYFALL — админка</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@600;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <!-- вход -->
+  <section class="login" id="login" hidden>
+    <form class="login-card" id="loginForm">
+      <svg class="login-key" viewBox="0 0 32 32" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="3"/><path d="M16 16l11 11M22 22l-3 3M25.5 25.5l-3 3" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+      <h1>Админка</h1>
+      <p>Введите пароль из файла <code>.env</code> (ADMIN_PASSWORD)</p>
+      <input type="password" id="password" placeholder="Пароль" autocomplete="current-password" required>
+      <button class="btn btn-acid" type="submit">Войти</button>
+      <div class="login-err" id="loginErr"></div>
+    </form>
+  </section>
+
+  <!-- приложение -->
+  <div class="app" id="app" hidden>
+    <aside class="side">
+      <a class="logo" href="/" target="_blank"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="3.2"/><path d="M16 16l11 11M22 22l-3 3M25.5 25.5l-3 3" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg><span data-shop>KEYFALL</span></a>
+      <nav class="tabs" id="tabs">
+        <button data-tab="overview" class="on"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Обзор</button>
+        <button data-tab="games"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 10v4M5 12h4M16 11h.01M18 13h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Игры и ключи</button>
+        <button data-tab="orders"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Заказы<b class="pill-n" id="waitingBadge" hidden></b></button>
+        <button data-tab="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Настройки</button>
+      </nav>
+      <div class="side-foot">
+        <a href="/" target="_blank">Открыть магазин ↗</a>
+        <button id="logout" type="button">Выйти</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <!-- обзор -->
+      <section class="view" data-view="overview">
+        <header class="vh"><h1>Обзор</h1><span class="muted" id="appName"></span></header>
+        <div class="tiles" id="tiles"></div>
+        <div class="two">
+          <div class="panel">
+            <div class="panel-h"><h2>Выручка за 14 дней</h2><span class="muted" id="chartTotal"></span></div>
+            <div class="chart" id="chart"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-h"><h2>Баланс CryptoBot</h2></div>
+            <div id="balance" class="balance"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><h2>Последние заказы</h2><button class="link" data-goto="orders">Все заказы →</button></div>
+          <div id="recent"></div>
+        </div>
+      </section>
+
+      <!-- игры -->
+      <section class="view" data-view="games" hidden>
+        <header class="vh">
+          <h1>Игры и ключи</h1>
+          <button class="btn btn-acid" id="addGame" type="button">+ Добавить игру</button>
+        </header>
+        <div class="filters">
+          <input type="search" id="gameSearch" placeholder="Поиск по названию…">
+          <div class="seg-ctl" id="gameFilter">
+            <button data-f="all" class="on">Все</button><button data-f="sale">Продажа</button><button data-f="giveaway">Раздачи</button><button data-f="empty">Без ключей</button>
+          </div>
+        </div>
+        <div id="gamesList" class="glist"></div>
+      </section>
+
+      <!-- заказы -->
+      <section class="view" data-view="orders" hidden>
+        <header class="vh"><h1>Заказы</h1><button class="btn btn-line" id="reloadOrders" type="button">Обновить</button></header>
+        <div class="filters">
+          <input type="search" id="orderSearch" placeholder="Номер заказа или игра…">
+          <div class="seg-ctl" id="orderFilter">
+            <button data-f="all" class="on">Все</button><button data-f="paid">Оплачены</button><button data-f="pending">Ждут оплаты</button><button data-f="giveaway">Раздачи</button><button data-f="problem">Проблемные</button>
+          </div>
+        </div>
+        <div class="table-wrap"><table class="table" id="ordersTable"></table></div>
+      </section>
+
+      <!-- настройки -->
+      <section class="view" data-view="settings" hidden>
+        <header class="vh"><h1>Настройки</h1></header>
+        <div id="settings"></div>
+      </section>
+    </main>
+  </div>
+
+  <div class="dlg" id="dlg" hidden>
+    <div class="dlg-bg" data-close></div>
+    <div class="dlg-panel" role="dialog" aria-modal="true">
+      <button class="x" type="button" data-close aria-label="Закрыть">✕</button>
+      <div id="dlgBody"></div>
+    </div>
+  </div>
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+  <div class="tip" id="tip" hidden></div>
+
+  <script src="/js/admin.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KEYFALL — ключи Steam за крипту</title>
+  <meta name="description" content="Ключи Steam за USDT, TON и BTC через @CryptoBot. Мгновенная выдача и бесплатные раздачи.">
+  <meta name="theme-color" content="#07070b">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="gridlines" aria-hidden="true"></div>
+  <canvas id="fx" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="nav" id="nav">
+    <a class="logo" href="#top" aria-label="На главную">
+      <svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="3.2"/><path d="M16 16l11 11M22 22l-3 3M25.5 25.5l-3 3" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg>
+      <span class="logo-text" data-shop-name>KEYFALL</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#drops">Раздачи</a>
+      <a href="#store">Магазин</a>
+      <a href="#how">Как это работает</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <button class="btn btn-glass" id="myKeysBtn" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 7a4 4 0 1 1-3.87 5H9v2H7v2H4v-3l5.13-5.13A4 4 0 0 1 15 7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="15.5" cy="8.5" r="1.2" fill="currentColor"/></svg>
+      <span>Мои ключи</span><b class="count" id="myKeysCount" hidden>0</b>
+    </button>
+  </header>
+
+  <main id="top">
+    <!-- ═════════ HERO ═════════ -->
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="pulse"></span><span>Оплата через <b>@CryptoBot</b><span class="eb-assets"> · <span id="assetsLine">USDT · TON · BTC</span></span></span></div>
+        <h1 class="hero-title" aria-label="Ключи падают с неба">
+          <span class="ht-line" data-drop>КЛЮЧИ</span>
+          <span class="ht-line ht-outline" data-drop>ПАДАЮТ</span>
+          <span class="ht-line"><span data-drop>С НЕБА</span><span class="ht-sticker">мгновенно ⚡</span></span>
+        </h1>
+        <p class="hero-sub">Ключи Steam для топовых игр по ценам ниже стора. Плати криптой — ключ появится на экране через пару секунд после оплаты. А ещё раздаём ключи бесплатно.</p>
+        <div class="hero-cta">
+          <a class="btn btn-acid magnetic" href="#store">Смотреть каталог <span aria-hidden="true">→</span></a>
+          <a class="btn btn-line magnetic" href="#drops">Забрать бесплатно</a>
+        </div>
+        <dl class="hero-stats">
+          <div><dt><b data-stat="delivered">0</b></dt><dd>ключей выдано</dd></div>
+          <div><dt><b data-stat="games">0</b></dt><dd>игр в каталоге</dd></div>
+          <div><dt><b data-stat="inStock">0</b></dt><dd>ключей в наличии</dd></div>
+        </dl>
+      </div>
+
+      <div class="hero-visual" id="heroVisual">
+        <div class="orbit orbit-1"><span>₮</span><span>◆</span></div>
+        <div class="orbit orbit-2"><span>₿</span><span>Ξ</span><span>Ł</span></div>
+        <div class="deck" id="deck"></div>
+        <div class="deck-shadow"></div>
+      </div>
+    </section>
+
+    <!-- ═════════ TICKER ═════════ -->
+    <div class="tickers" aria-hidden="true">
+      <div class="ticker ticker-a"><div class="ticker-track" id="tickerA"></div></div>
+      <div class="ticker ticker-b"><div class="ticker-track" id="tickerB"></div></div>
+    </div>
+
+    <!-- ═════════ DROPS ═════════ -->
+    <section class="section" id="drops">
+      <header class="section-head" data-reveal>
+        <span class="kicker"><i>01</i> Free drop</span>
+        <h2>Раздачи<span class="h2-dot">.</span></h2>
+        <p>Зажми кнопку и держи — ключ твой. Один бесплатный ключ раз в <b id="cooldownH">24</b> ч.</p>
+      </header>
+      <div class="drops" id="drops-list"></div>
+    </section>
+
+    <!-- ═════════ STORE ═════════ -->
+    <section class="section" id="store">
+      <header class="section-head" data-reveal>
+        <span class="kicker"><i>02</i> Store</span>
+        <h2>Каталог<span class="h2-dot">.</span></h2>
+        <p>Активация в Steam, регион — весь мир, если не указано иное. Оплата в USDT, TON, BTC и других монетах.</p>
+      </header>
+      <div class="toolbar" data-reveal>
+        <label class="search">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <input id="search" type="search" placeholder="Найти игру…" autocomplete="off">
+        </label>
+        <div class="chips" id="chips" role="tablist" aria-label="Жанры"></div>
+        <label class="sort">
+          <select id="sort" aria-label="Сортировка">
+            <option value="featured">Сначала хиты</option>
+            <option value="cheap">Сначала дешёвые</option>
+            <option value="expensive">Сначала дорогие</option>
+            <option value="discount">Самые большие скидки</option>
+            <option value="new">Новинки</option>
+          </select>
+        </label>
+      </div>
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <!-- ═════════ HOW ═════════ -->
+    <section class="section" id="how">
+      <header class="section-head" data-reveal>
+        <span class="kicker"><i>03</i> How it works</span>
+        <h2>Три шага<span class="h2-dot">.</span></h2>
+      </header>
+      <ol class="steps">
+        <li data-reveal>
+          <span class="step-n">01</span>
+          <div class="step-ic"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H4z M8 20h8 M12 16v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div>
+          <h3>Выбери игру</h3>
+          <p>Каталог обновляется постоянно. Пока висит счёт, ключ закреплён за тобой и никому другому не уйдёт.</p>
+        </li>
+        <li data-reveal>
+          <span class="step-n">02</span>
+          <div class="step-ic"><svg viewBox="0 0 24 24"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z M12 12l8-4.5 M12 12v9 M12 12L4 7.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div>
+          <h3>Оплати в @CryptoBot</h3>
+          <p>USDT, TON, BTC и другие монеты. Можно отсканировать QR телефоном или открыть счёт прямо в Telegram.</p>
+        </li>
+        <li data-reveal>
+          <span class="step-n">03</span>
+          <div class="step-ic"><svg viewBox="0 0 24 24"><path d="M15 7a4 4 0 1 1-3.87 5H9v2H7v2H4v-3l5.13-5.13A4 4 0 0 1 15 7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div>
+          <h3>Забери ключ</h3>
+          <p>Ключ появится на сайте и придёт в чат с @CryptoBot. Активация в Steam в один клик.</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ═════════ FAQ ═════════ -->
+    <section class="section" id="faq">
+      <header class="section-head" data-reveal>
+        <span class="kicker"><i>04</i> FAQ</span>
+        <h2>Вопросы<span class="h2-dot">.</span></h2>
+      </header>
+      <div class="faq" data-reveal>
+        <details><summary>Как я получу ключ после оплаты?</summary><p>Сразу после оплаты ключ откроется на этой странице. Он же придёт в чат с @CryptoBot, где вы платили. Ещё все ваши ключи сохраняются в разделе «Мои ключи» в этом браузере.</p></details>
+        <details><summary>Какими монетами можно заплатить?</summary><p>Можно платить <span data-assets>USDT, TON, BTC</span>. Цена указана в фиате, и @CryptoBot сам пересчитает её в выбранную монету по текущему курсу.</p></details>
+        <details><summary>Как активировать ключ в Steam?</summary><p>Нажмите «Активировать в Steam» рядом с ключом. Или откройте Steam → «Игры» → «Активировать в Steam…» и вставьте ключ.</p></details>
+        <details><summary>Сколько ключей можно забрать в раздаче?</summary><p>По одному ключу из каждой раздачи, но не чаще одного раза в <span data-cooldown>24</span> ч. Ключи разбирают быстро, так что не тяните.</p></details>
+        <details><summary>Что делать, если ключ не активируется?</summary><p>Напишите нам в поддержку <span data-support>через Telegram</span> и укажите номер заказа. Мы проверим и заменим ключ.</p></details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-big" aria-hidden="true"><span data-shop-name>KEYFALL</span></div>
+    <div class="footer-row">
+      <span>© <span id="year"></span> <span data-shop-name>KEYFALL</span> · ключи Steam за крипту</span>
+      <span class="footer-links"><a href="#store">Каталог</a><a href="#drops">Раздачи</a><a id="supportLink" href="#" hidden target="_blank" rel="noopener">Поддержка</a></span>
+    </div>
+  </footer>
+
+  <!-- модалка -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal-bg" data-close></div>
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-label="Окно игры">
+      <button class="modal-x" type="button" data-close aria-label="Закрыть">✕</button>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- мои ключи -->
+  <aside class="drawer" id="drawer" hidden aria-label="Мои ключи">
+    <div class="drawer-bg" data-close-drawer></div>
+    <div class="drawer-panel">
+      <header><h3>Мои ключи</h3><button class="modal-x" type="button" data-close-drawer aria-label="Закрыть">✕</button></header>
+      <p class="drawer-note">Список хранится только в этом браузере. Ключи от оплаченных заказов также лежат в чате с @CryptoBot.</p>
+      <div class="drawer-list" id="drawerList"></div>
+    </div>
+  </aside>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+  <canvas id="confetti" aria-hidden="true"></canvas>
+
+  <script src="/js/app.js" type="module"></script>
+</body>
+</html>
