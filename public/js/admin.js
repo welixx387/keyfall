@@ -101,7 +101,7 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !dlg.el.
 
 // ───────── обзор ─────────
 async function loadOverview(render = true) {
-  const o = (A.ov = await api('/api/admin/overview'));
+  const o = (A.ov = await api(`/api/admin/overview?tz=${new Date().getTimezoneOffset()}`));
   A.fiat = o.cfg.fiat;
   $$('[data-shop]').forEach((el) => { el.textContent = o.cfg.shopName; });
   const wb = $('#waitingBadge');
@@ -522,6 +522,7 @@ function renderSettings() {
       ${kv('Бронь ключа на время оплаты', `${c.ttlMin} мин`)}
       ${kv('Раздачи', `1 ключ в ${c.cooldownH} ч на посетителя`)}
       ${kv('Адрес сайта (PUBLIC_URL)', esc(c.publicUrl))}
+      ${kv('База данных', c.db === 'postgres' ? 'Postgres (DATABASE_URL)' : 'встроенная (папка data/pg)')}
     </div>
     <div class="panel" style="margin-bottom:14px">
       <div class="panel-h"><h2>Вебхук CryptoBot</h2></div>
@@ -529,18 +530,38 @@ function renderSettings() {
         ? `<div class="note ok">Добавьте этот адрес в настройках приложения, тогда оплаты будут засчитываться мгновенно:
             <div class="copyline"><input type="text" readonly value="${esc(c.webhookUrl)}"><button class="btn btn-line" type="button" data-copy="${esc(c.webhookUrl)}">Копировать</button></div>
             <ol class="steps-list"><li>@CryptoBot → Crypto Pay → Мои приложения → ваше приложение</li><li>Вебхуки → Включить вебхуки</li><li>Вставьте адрес выше и сохраните</li></ol></div>`
-        : `<div class="note">Сайт сейчас работает на <b>${esc(c.publicUrl)}</b>. Вебхуки CryptoBot работают только с публичным https-адресом. Пока вебхука нет, сервер сам сверяет счета каждые 30 секунд и при открытой странице заказа, так что оплата всё равно засчитается. Когда сайт переедет на домен, впишите его в <code>PUBLIC_URL</code> в файле <code>.env</code>.</div>`}
+        : `<div class="note">Сайт сейчас работает на <b>${esc(c.publicUrl)}</b>. Вебхуки CryptoBot работают только с публичным https-адресом. Пока вебхука нет, сервер сам сверяет счета каждые 30 секунд и при открытой странице заказа, так что оплата всё равно засчитается. Когда сайт переедет на домен, впишите его в переменную <code>PUBLIC_URL</code>.</div>`}
     </div>
     <div class="panel">
       <div class="panel-h"><h2>Как поменять настройки</h2></div>
-      <p class="muted" style="margin:0">Всё, что выше, и пароль от админки задаются в файле <code>.env</code> в папке сайта. После правки перезапустите сервер.</p>
+      <p class="muted" style="margin:0">Всё, что выше, и пароль от админки задаются переменными окружения: на Vercel в Settings → Environment Variables (после правки нажмите Redeploy), на своём компьютере в файле <code>.env</code> (после правки перезапустите сервер).</p>
     </div>
     ${o.hasDemo ? `
     <div class="panel" style="margin-top:14px">
       <div class="panel-h"><h2>Демо-данные</h2></div>
       <p class="muted" style="margin:0 0 14px">В магазине есть демо-игры с ненастоящими ключами. Их можно «купить» без оплаты, чтобы посмотреть, как выдаётся ключ. Удалите их перед запуском, настоящие игры и заказы не пострадают.</p>
       <button class="btn btn-danger" type="button" data-clear-demo>Удалить демо-игры и демо-заказы</button>
-    </div>` : ''}`;
+    </div>` : `
+    <div class="panel" style="margin-top:14px">
+      <div class="panel-h"><h2>Демо-витрина</h2></div>
+      <p class="muted" style="margin:0 0 14px">Добавит 13 популярных игр с картинками из Steam и ненастоящими DEMO-ключами. Их можно «купить» без оплаты, чтобы посмотреть, как всё работает. Потом удаляются одной кнопкой.</p>
+      <button class="btn btn-line" type="button" data-seed-demo>Загрузить демо-витрину</button>
+    </div>`}`;
+  const seed = $('[data-seed-demo]');
+  seed?.addEventListener('click', async () => {
+    seed.disabled = true;
+    seed.textContent = 'Загружаю игры из Steam…';
+    try {
+      const r = await api('/api/admin/demo/seed', { method: 'POST' });
+      toast(`Добавлено демо-игр: ${r.added}`);
+      await loadOverview(false);
+      renderSettings();
+    } catch (err) {
+      toast(err.message, 'error');
+      seed.disabled = false;
+      seed.textContent = 'Загрузить демо-витрину';
+    }
+  });
   const clr = $('[data-clear-demo]');
   clr?.addEventListener('click', async () => {
     if (!clr.dataset.sure) { clr.dataset.sure = 1; clr.textContent = 'Точно удалить? Нажмите ещё раз'; return; }

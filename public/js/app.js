@@ -953,7 +953,8 @@ async function init() {
     renderGrid();
   } catch (e) {
     renderTicker([]);
-    $('#grid').innerHTML = '<div class="empty"><b>Не удалось загрузить каталог</b>Обновите страницу через минуту.</div>';
+    $('#grid').innerHTML = `<div class="empty"><b>Не удалось загрузить каталог</b>${esc(e.status === 503 ? e.message : 'Обновите страницу через минуту.')}</div>`;
+    $('#drops-list').innerHTML = '';
   }
   openFromUrl();
 }
